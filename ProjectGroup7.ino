@@ -55,12 +55,12 @@ Potential problems/changes:
 //Pins
 int buttonL = 0;
 int buttonR = 14;
-int basePin = 1;
-int shoulderPin = 2;
-int elbowPin = 3;
-int wrist1Pin = 10;
-int wrist2Pin = 11;
-int wrist3Pin = 12;
+// int basePin = 1;
+// int shoulderPin = 2;
+// int elbowPin = 3;
+// int wrist1Pin = 10;
+// int wrist2Pin = 11;
+// int wrist3Pin = 12;
 
 TFT_eSPI tft = TFT_eSPI();
 int width= 320, height = 170;
@@ -76,9 +76,6 @@ const int GRIPPER_PORT = 63352;
 WiFiClient client; 
 WiFiClient gripper_client;
 
-int anglePins[6] = {basePin, shoulderPin, elbowPin, wrist1Pin, wrist2Pin, wrist3Pin};
-float angles[6];
-
 float **playback_states; //2d array of measured joint angles for playback
 float sampleRate = 500; //samples position every 500ms
 int number_of_samples = 10; //will be increased as sampling goes on
@@ -89,6 +86,13 @@ float a = 0.2, v = 0.2;
 
 void setup() {
   Serial.begin(115200);
+  pinMode(ANALOG_PIN_1, INPUT);
+  pinMode(ANALOG_PIN_2, INPUT);
+  pinMode(ANALOG_PIN_3, INPUT);
+  pinMode(ANALOG_PIN_4, INPUT);
+  pinMode(ANALOG_PIN_5, INPUT);
+  pinMode(ANALOG_PIN_6, INPUT);
+
   for (int i = 0; i < 30; i++) {
     Serial.println();
   }
@@ -97,9 +101,6 @@ void setup() {
 
   pinMode(buttonL, INPUT_PULLUP);
   pinMode(buttonR, INPUT_PULLUP);
-  for (int i = 0; i < 6; i++) {
-    pinMode(anglePins[i], INPUT);
-  }
 
   //Set up ESP32-s3 screen
   tft.init();
@@ -109,7 +110,7 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE);
   Serial.println("ESP screen prepared");
-  printAngles(angles);
+  // printAngles(angles);
 
   //Connect to router
   Serial.print("Connecting to ");
@@ -131,13 +132,36 @@ void setup() {
   Serial.print("localIP: ");
   Serial.println(WiFi.localIP());
 
-  
+  // Display raw joint space / cartesian space values
+  updateDisplay(2);
+
+  // toggleUR5Connection();
 }
 
 void loop() {
+  delay(1000);
+
+  getJointAngles();
+  Serial.print("t1: "); Serial.print(t1);
+  Serial.print("| t2: "); Serial.print(t2);
+  Serial.print("| t3: "); Serial.print(t3);
+  Serial.print("| t4: "); Serial.print(t4);
+  Serial.print("| t5: "); Serial.print(t5);
+  Serial.print("| t6: "); Serial.println(t6);
+
+  //float myPose[] = {mapped1*PI/180, (mapped2-90)*PI/180 , mapped3*PI/180, -90*PI/180,0,0};
+  float myPose[] = {t1, (-90)*PI/180 , t3, -90*PI/180, 0, 0};
+  //Serial.println(myPose);
+  moveJ(myPose, 0.5, 0.5, true);
+  delay(3000);
+
+
+  /*
+  //temp comment 
   static int last_pressed = millis();
   static int last_sample = millis();
 
+  // Debounce
   if ((millis() - last_pressed) > 500) {
     if (digitalRead(buttonL) == LOW) {
       if (toggleUR5Connection() && toggleGripperConnection()) 
@@ -206,5 +230,5 @@ void loop() {
     printAngles(angles);
     last_refresh = millis();
   }
+  */
 }
-

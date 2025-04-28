@@ -130,16 +130,6 @@ bool setGripper(bool gripperState)
   return true;
  }
 
-//reads the potentiometer values and stores them in global angles array
-//this is the function to CALIBRATE POT READINGS TO ANGLES
-void getAngles() 
-{
-  for (int i = 0; i<6; i++) 
-  {
-    angles[i] = analogRead(anglePins[i]);
-  }
-}
-
 //iterates through the playback_angles 2D array containing the angles and gripper states 
 //at each time the angles were sampled during moving the controller in form:
 //[base angle, shoulder, elbow, wrist1, wrist2, wrist3, gripperState]
@@ -165,5 +155,9 @@ bool playBack()
   }
   Serial.println("Playback finished");
   return true;
+}
+
+float mapFloat(int x, int in_min, int in_max, float out_min, float out_max) {
+  return (float)(x - in_min) * (out_max - out_min) / (float)(in_max - in_min) + out_min;
 }
 

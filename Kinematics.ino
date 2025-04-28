@@ -1,5 +1,13 @@
 #include "ProjectGroup7.h"
 
+double t1 = 0.0; 
+double t2 = 0.0; 
+double t3 = 0.0; 
+double t4 = 0.0; 
+double t5 = 0.0;
+double t6 = 0.0;
+double jointPositions[6][3];
+
 // Debug function to print Cartesian Space
 void printJoints() {
   for (int i = 0; i < 6; i++) {
@@ -7,6 +15,19 @@ void printJoints() {
       Serial.println(jointPositions[i][j]);
     }
   }
+}
+
+
+// Get and map joint angles from arduino (also calls functions to update Cartesian Space values and display)
+void getJointAngles() {
+  t1 = mapFloat(analogRead(ANALOG_PIN_1), 0, 4095, -90.0, 90.0) * PI / 180;
+  t2 = mapFloat(analogRead(ANALOG_PIN_2), 0, 4095, -90.0, 90.0) * PI / 180;
+  t3 = mapFloat(analogRead(ANALOG_PIN_3), 0, 4095, -150.0, 150.0) * PI / 180;
+  t4 = mapFloat(analogRead(ANALOG_PIN_4), 0, 4095, -90.0, 90.0) * PI / 180;
+  t5 = mapFloat(analogRead(ANALOG_PIN_5), 0, 4095, -90.0, 90.0) * PI / 180;
+  t6 = mapFloat(analogRead(ANALOG_PIN_6), 0, 4095, -90.0, 90.0) * PI / 180;
+  forwardKinematics();
+  updateDisplay(0);
 }
 
 // Updates Cartesian Space array (in-place) using joint angles t1-t6
