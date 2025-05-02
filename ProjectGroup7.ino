@@ -86,12 +86,15 @@ float a = 0.2, v = 0.2;
 
 void setup() {
   Serial.begin(115200);
+
+  // Initialise joint pins and pushbutton
   pinMode(ANALOG_PIN_1, INPUT);
   pinMode(ANALOG_PIN_2, INPUT);
   pinMode(ANALOG_PIN_3, INPUT);
   pinMode(ANALOG_PIN_4, INPUT);
   pinMode(ANALOG_PIN_5, INPUT);
   pinMode(ANALOG_PIN_6, INPUT);
+  pinMode(PUSHBUTTON_PIN, INPUT_PULLUP);
 
   for (int i = 0; i < 30; i++) {
     Serial.println();
@@ -110,7 +113,6 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE);
   Serial.println("ESP screen prepared");
-  // printAngles(angles);
 
   //Connect to router
   Serial.print("Connecting to ");
@@ -139,96 +141,96 @@ void setup() {
 }
 
 void loop() {
-  delay(1000);
-
-  getJointAngles();
-  Serial.print("t1: "); Serial.print(t1);
-  Serial.print("| t2: "); Serial.print(t2);
-  Serial.print("| t3: "); Serial.print(t3);
-  Serial.print("| t4: "); Serial.print(t4);
-  Serial.print("| t5: "); Serial.print(t5);
-  Serial.print("| t6: "); Serial.println(t6);
-
-  //float myPose[] = {mapped1*PI/180, (mapped2-90)*PI/180 , mapped3*PI/180, -90*PI/180,0,0};
-  float myPose[] = {t1, (-90)*PI/180 , t3, -90*PI/180, 0, 0};
-  //Serial.println(myPose);
-  moveJ(myPose, 0.5, 0.5, true);
-  delay(3000);
-
-
-  /*
-  //temp comment 
   static int last_pressed = millis();
   static int last_sample = millis();
+  static int last_refresh = millis();
+
+  // Get and print out joint angles every 1 second
+  if ((millis() - last_refresh) > 100) {
+    last_refresh = millis();
+    getJointAngles();
+    Serial.print("t1: "); Serial.print(t1);
+    Serial.print("| t2: "); Serial.print(t2);
+    Serial.print("| t3: "); Serial.print(t3);
+    Serial.print("| t4: "); Serial.print(t4);
+    Serial.print("| t5: "); Serial.print(t5);
+    Serial.print("| t6: "); Serial.println(t6);
+  }
+
+  float myPose[] = {t1, (-90)*PI/180 , t3, -90*PI/180, 0, 0};
+  // moveJ(myPose, 0.5, 0.5, true);
+  // delay(3000);
 
   // Debounce
   if ((millis() - last_pressed) > 500) {
     if (digitalRead(buttonL) == LOW) {
-      if (toggleUR5Connection() && toggleGripperConnection()) 
-      {
-        Serial.println("Recording started");
-        //free memory from previous playback_states
-        for (int i = 0; i < number_of_samples; i++) {
-          free(playback_states[i]);
-        }
-        free(playback_states);
+      // UNCOMMENT ONCE TESTED
 
-        number_of_samples = 10; //will be increased as sampling goes on
-        playbackIndex = 0;  // To track current sample index
-        gripperState = 0;
-        //allocate memory for new playback_states
-        playback_states = (float**)malloc(number_of_samples * sizeof(float*));
-        for (int i = 0; i < number_of_samples; i++) {
-          playback_states[i] = (float*)malloc((6 + 1) * sizeof(float));  // 6 angles plus gripper state
-        }
-      } else {
-        Serial.println("Recording ended");
-      }
+      // if (toggleUR5Connection() && toggleGripperConnection()) 
+      // {
+      //   Serial.println("Recording started");
+      //   //free memory from previous playback_states
+      //   for (int i = 0; i < number_of_samples; i++) {
+      //     free(playback_states[i]);
+      //   }
+      //   free(playback_states);
+
+      //   number_of_samples = 10; //will be increased as sampling goes on
+      //   playbackIndex = 0;  // To track current sample index
+      //   gripperState = 0;
+      //   //allocate memory for new playback_states
+      //   playback_states = (float**)malloc(number_of_samples * sizeof(float*));
+      //   for (int i = 0; i < number_of_samples; i++) {
+      //     playback_states[i] = (float*)malloc((6 + 1) * sizeof(float));  // 6 angles plus gripper state
+      //   }
+      // } else {
+      //   Serial.println("Recording ended");
+      // }
       last_pressed = millis();
     } else if (digitalRead(buttonR) == LOW) {
-      if (client.connected()) {
-        gripperState = !gripperState;
-        setGripper(gripperState);
-      } else {
-        playBack();
-      }
+      // UNCOMMENT ONCE TESTED
+
+      // if (client.connected()) {
+      //   gripperState = !gripperState;
+      //   setGripper(gripperState);
+      // } else {
+      //   playBack();
+      // }
       
       last_pressed = millis();
+    } else if (digitalRead(PUSHBUTTON_PIN) == LOW) {
+      // Pushbutton used to toggle screen
+      screen_no = 1 + (screen_no) % 2;
+      updateDisplay(screen_no);
+      last_pressed = millis();
     }
-    getAngles();
+
+    // UNCOMMENT ONCE TESTED
     
-
-    if (client.connected() && millis() - last_sample > sampleRate) {
-      //append state to playback_states
-      if (playbackIndex >= number_of_samples) {
-        // needs to increase memory allocated to playback_states
-        number_of_samples += number_of_samples;
-        playback_states = (float**)realloc(playback_states, number_of_samples * sizeof(float*));
+    // if (client.connected() && millis() - last_sample > sampleRate) {
+    //   //append state to playback_states
+    //   if (playbackIndex >= number_of_samples) {
+    //     // needs to increase memory allocated to playback_states
+    //     number_of_samples += number_of_samples;
+    //     playback_states = (float**)realloc(playback_states, number_of_samples * sizeof(float*));
         
-        // Reallocate memory for each row to store joint angles + gripper state
-        for (int i = playbackIndex; i < number_of_samples; i++) {
-          playback_states[i] = (float*)malloc((6 + 1) * sizeof(float));
-        }
-      }
+    //     // Reallocate memory for each row to store joint angles + gripper state
+    //     for (int i = playbackIndex; i < number_of_samples; i++) {
+    //       playback_states[i] = (float*)malloc((6 + 1) * sizeof(float));
+    //     }
+    //   }
       
-      // Record joint angles and gripper state
-      if (playbackIndex < number_of_samples) {
-        for (int i = 0; i < 6; i++) {
-          playback_states[playbackIndex][i] = (int)(angles[i] * 100.0) / 100.0;  // Record joint angle rounded to 2 d.p
-        }
-        playback_states[playbackIndex][6] = gripperState;  // Store gripper state
+    //   // Record joint angles and gripper state
+    //   if (playbackIndex < number_of_samples) {
+    //     for (int i = 0; i < 6; i++) {
+    //       playback_states[playbackIndex][i] = (int)(angles[i] * 100.0) / 100.0;  // Record joint angle rounded to 2 d.p
+    //     }
+    //     playback_states[playbackIndex][6] = gripperState;  // Store gripper state
         
-        playbackIndex++;  // Increment the sample index
-      }
-      last_sample = millis();  
-    }
+    //     playbackIndex++;  // Increment the sample index
+    //   }
+    //   last_sample = millis();  
+    // }
 
   }
-
-  static int last_refresh = millis();
-  if ((millis() - last_refresh) > 1000) {
-    printAngles(angles);
-    last_refresh = millis();
-  }
-  */
 }

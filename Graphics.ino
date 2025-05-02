@@ -7,9 +7,10 @@ playing back the recorded sequence but this might be good to display on ttgo too
 
 #include "ProjectGroup7.h"
 
+int screen_no = 1;
+
 void updateDisplay(int _screen_no) {
   // screen_no = 1 (raw values), 2 (visualisation of robot), 0 (don't change screen - just update!)
-  static int screen_no = 2;
   if (_screen_no != 0) {
     screen_no = _screen_no;
   }

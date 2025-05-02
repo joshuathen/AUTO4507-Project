@@ -45,17 +45,18 @@ extern double t4;
 extern double t5;
 extern double t6;
 
-//// PINOUT ESP32-S3
+// PINOUT ESP32-S3
 #define ANALOG_PIN_1 1    // GPIO1 (safe on S3)
 #define ANALOG_PIN_2 2    // GPIO2 (safe)
 #define ANALOG_PIN_3 3    // GPIO3 (safe)
-#define ANALOG_PIN_4 10    // GPIO3 (safe)
-#define ANALOG_PIN_5 11   // GPIO3 (safe)
-#define ANALOG_PIN_6 12    // GPIO3 (safe)
+#define ANALOG_PIN_4 10
+#define ANALOG_PIN_5 11
+#define ANALOG_PIN_6 12
+#define PUSHBUTTON_PIN 13 // Pushbutton used to toggle/change screens
 
 // Cartesian Space (3D point vectors of each joint from base to tip)
 extern double jointPositions[6][3];
 
-//Graphics functions
-// void printAngles(float angles[6]);
+// Graphics
+extern int screen_no;
 
