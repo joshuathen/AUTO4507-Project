@@ -77,7 +77,7 @@ WiFiClient client;
 WiFiClient gripper_client;
 
 float **playback_states; //2d array of measured joint angles for playback
-float sampleRate = 500; //samples position every 500ms
+float sampleRate = 3000; //samples position every 500ms
 int number_of_samples = 10; //will be increased as sampling goes on
 int playbackIndex = 0;  // To track current sample index
 bool gripperState; //0=open, 1=closed
@@ -133,9 +133,6 @@ void setup() {
     delay(2000 / width);
   }
   delay(1000);
-
-  // Display raw joint space / cartesian space values
-  updateDisplay(2);
 
   // toggleUR5Connection();
   STATE = "DISCONNECTED";
@@ -237,11 +234,6 @@ void loop() {
       //   playBack();
       // }
       
-      last_pressed = millis();
-    } else if (digitalRead(PUSHBUTTON_PIN) == LOW) {
-      // Pushbutton used to toggle screen
-      screen_no = 1 + (screen_no) % 2;
-      updateDisplay(screen_no);
       last_pressed = millis();
     }
 

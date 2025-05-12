@@ -39,7 +39,6 @@ bool setGripper(bool gripperState);
 bool playBack();
 
 //Graphics functions
-void updateDisplay(int _screen_no);
 void printAngles();
 
 // Joint Space (angles of each joint from base to tip)

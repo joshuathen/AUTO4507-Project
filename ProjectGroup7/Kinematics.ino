@@ -17,17 +17,21 @@ void printJoints() {
   }
 }
 
-
 // Get and map joint angles from arduino (also calls functions to update Cartesian Space values and display)
 void getJointAngles() {
-  t1 = mapFloat(analogRead(ANALOG_PIN_1), 0, 4095, -90.0, 90.0) * PI / 180;
-  t2 = mapFloat(analogRead(ANALOG_PIN_2), 0, 4095, -90.0, 90.0) * PI / 180;
+  t1 = mapFloat(analogRead(ANALOG_PIN_1), 0, 4095, -150.0, 150.0) * PI / 180;
+  t2 = (-90*PI/180) - mapFloat(analogRead(ANALOG_PIN_2), 0, 4095, -150.0, 150.0) * PI / 180;
   t3 = mapFloat(analogRead(ANALOG_PIN_3), 0, 4095, -150.0, 150.0) * PI / 180;
-  t4 = mapFloat(analogRead(ANALOG_PIN_4), 0, 4095, -90.0, 90.0) * PI / 180;
+  t4 = mapFloat(analogRead(ANALOG_PIN_4), 0, 4095, -150.0, 150.0) * PI / 180;
   t5 = mapFloat(analogRead(ANALOG_PIN_5), 0, 4095, -90.0, 90.0) * PI / 180;
   t6 = mapFloat(analogRead(ANALOG_PIN_6), 0, 4095, -90.0, 90.0) * PI / 180;
+  angles[0] = t1;
+  angles[1] = t2;
+  angles[2] = t3;
+  angles[3] = t4;
+  angles[4] = t5;
+  angles[5] = t6;
   forwardKinematics();
-  updateDisplay(0);
 }
 
 // Updates Cartesian Space array (in-place) using joint angles t1-t6
@@ -55,7 +59,4 @@ void forwardKinematics() {
   jointPositions[5][0] = (0.10915+0.0823*cos(t5))*sin(t1)+cos(t1)*(-0.425*cos(t2)-0.39225*cos(t2+t3)+0.09465*sin(t2+t3+t4)+0.04115*sin(t2+t3+t4-t5)-0.04115*sin(t2+t3+t4+t5));
   jointPositions[5][1] = cos(t1)*(-0.10915-0.0823*cos(t5))+sin(t1)*(-0.425*cos(t2)-0.39225*cos(t2+t3)+0.09465*sin(t2+t3+t4)+0.04115*sin(t2+t3+t4-t5)-0.04115*sin(t2+t3+t4+t5));
   jointPositions[5][2] = 0.089159-0.09465*cos(t2+t3+t4)-0.04115*cos(t2+t3+t4-t5)+0.04115*cos(t2+t3+t4+t5)-0.425*sin(t2)-0.39225*sin(t2+t3);
-
-  // Update display (but don't change the screen_no)
-  updateDisplay(0);
 }

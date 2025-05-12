@@ -163,25 +163,25 @@ float mapFloat(int x, int in_min, int in_max, float out_min, float out_max) {
 
 //reads the potentiometer values and stores them in global angles array
 //this is the function to CALIBRATE POT READINGS TO ANGLES
-void getAngles() {
-  int maxAngle = 270;
-  int NUM_SAMPLES = 5;  //takes 5 readings of each pin to average them
+// void getAngles() {
+//   int maxAngle = 270;
+//   int NUM_SAMPLES = 5;  //takes 5 readings of each pin to average them
 
-  for (int i = 0; i < 6; i++) {
-    int reading = 0;
-    for (int j = 0; j < NUM_SAMPLES; j++) {
-      reading += analogRead(anglePins[i]);
-    }
-    reading /= NUM_SAMPLES;
+//   for (int i = 0; i < 6; i++) {
+//     int reading = 0;
+//     for (int j = 0; j < NUM_SAMPLES; j++) {
+//       reading += analogRead(anglePins[i]);
+//     }
+//     reading /= NUM_SAMPLES;
 
-    float angle = ((float)reading / 4095.0) * maxAngle - maxAngle / 2;
-    angles[i] = angle;  // =round(angle * 10); to save space, angle 149.4 ==> 1494, get back with "1494/10.0"
-  }
-  angles[1] = -90.0;
-  angles[2] = -90.0;
-  angles[3] = -90.0;
-  angles[4] = 90.0;
-  angles[5] = 180.0;
-}
+//     float angle = ((float)reading / 4095.0) * maxAngle - maxAngle / 2;
+//     angles[i] = angle;  // =round(angle * 10); to save space, angle 149.4 ==> 1494, get back with "1494/10.0"
+//   }
+//   angles[1] = -90.0;
+//   angles[2] = -90.0;
+//   angles[3] = -90.0;
+//   angles[4] = 90.0;
+//   angles[5] = 180.0;
+// }
 
 
