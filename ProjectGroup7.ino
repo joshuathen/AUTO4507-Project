@@ -135,12 +135,30 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Display raw joint space / cartesian space values
-  updateDisplay(2);
+  updateDisplay(1);
 
-  // toggleUR5Connection();
+  toggleUR5Connection();
 }
 
 void loop() {
+  delay(3000);
+
+  getJointAngles();
+  Serial.print("t1: "); Serial.print(t1);
+  Serial.print("| t2: "); Serial.print(t2);
+  Serial.print("| t3: "); Serial.print(t3);
+  Serial.print("| t4: "); Serial.print(t4);
+  Serial.print("| t5: "); Serial.print(t5);
+  Serial.print("| t6: "); Serial.println(t6);
+
+  //float myPose[] = {mapped1*PI/180, (mapped2-90)*PI/180 , mapped3*PI/180, -90*PI/180,0,0};
+  float myPose[] = {t1, (-90*PI/180)-t2, t3, t4, 0, 0};
+  //Serial.println(myPose);
+  moveJ(myPose, 0.5, 0.5, true);
+
+
+  /*
+  //temp comment
   static int last_pressed = millis();
   static int last_sample = millis();
   static int last_refresh = millis();
@@ -233,4 +251,5 @@ void loop() {
     // }
 
   }
+  */
 }
