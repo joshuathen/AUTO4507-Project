@@ -61,9 +61,8 @@ bool toggleGripperConnection()
 }
 
 // sends the moveL command, has option to be in jointspace(jointspace = true) or in pose
-// most likely will just need jointspace=true as we are taking angle inputs
-bool moveL(float pose[], float a, float v, bool JointSpace) 
-{         
+// a and v dont change anything as t is used to move to target position in 0.5 seconds(same as sample rate)
+bool moveL(float pose[], float a, float v, bool JointSpace) {
   String command = "movel(";
 
   if (JointSpace == false) {
@@ -71,14 +70,15 @@ bool moveL(float pose[], float a, float v, bool JointSpace)
   } else {
     command += "[";
   }
-  
+
   for (int i = 0; i < 6; i++) {
-    command += String(pose[i], 3); //rounds angle to 3 decimal place
+    float angle_rad = pose[i] * (PI / 180);
+    command += String(angle_rad, 3);  //rounds angle to 3 decimal place
     if (i != 5) {
       command += ",";
     }
   }
-  command += "], a=" + String(a) + ", v=" + String(v) + ")\n";
+  command += "], a=" + String(a) + ", v=" + String(v) + ", t=" + String(sampleRate/1000) + ")\n";
 
   Serial.println(command);
   client.print(command);
@@ -87,8 +87,7 @@ bool moveL(float pose[], float a, float v, bool JointSpace)
 }
 
 //same as moveL function above but with moveJ
-bool moveJ(float pose[], float a, float v, bool JointSpace) 
-{         
+bool moveJ(float pose[], float a, float v, bool JointSpace) {
   String command = "movej(";
 
   if (JointSpace == false) {
@@ -96,14 +95,15 @@ bool moveJ(float pose[], float a, float v, bool JointSpace)
   } else {
     command += "[";
   }
-  
+
   for (int i = 0; i < 6; i++) {
-    command += String(pose[i], 3); //rounds angle to 3 decimal place
+    float angle_rad = pose[i] * (PI / 180);
+    command += String(angle_rad, 3);  //rounds angle to 3 decimal place
     if (i != 5) {
       command += ",";
     }
   }
-  command += "], a=" + String(a) + ", v=" + String(v) + ")\n";
+  command += "], a=" + String(a) + ", v=" + String(v) + ", t=" + String(sampleRate/1000) + ")\n";
 
   Serial.println(command);
   client.print(command);
@@ -160,4 +160,28 @@ bool playBack()
 float mapFloat(int x, int in_min, int in_max, float out_min, float out_max) {
   return (float)(x - in_min) * (out_max - out_min) / (float)(in_max - in_min) + out_min;
 }
+
+//reads the potentiometer values and stores them in global angles array
+//this is the function to CALIBRATE POT READINGS TO ANGLES
+void getAngles() {
+  int maxAngle = 270;
+  int NUM_SAMPLES = 5;  //takes 5 readings of each pin to average them
+
+  for (int i = 0; i < 6; i++) {
+    int reading = 0;
+    for (int j = 0; j < NUM_SAMPLES; j++) {
+      reading += analogRead(anglePins[i]);
+    }
+    reading /= NUM_SAMPLES;
+
+    float angle = ((float)reading / 4095.0) * maxAngle - maxAngle / 2;
+    angles[i] = angle;  // =round(angle * 10); to save space, angle 149.4 ==> 1494, get back with "1494/10.0"
+  }
+  angles[1] = -90.0;
+  angles[2] = -90.0;
+  angles[3] = -90.0;
+  angles[4] = 90.0;
+  angles[5] = 180.0;
+}
+
 

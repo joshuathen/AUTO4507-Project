@@ -19,9 +19,32 @@ void updateDisplay(int _screen_no) {
 
   if (screen_no == 1) {
     // Draw Joint Values
+    int xOffset = 3;
+    int dy = height / 7 + 4;
+    for (int i = 0; i < 6; i++) {
+      int yOffset = height / 28 + i * dy;
+      tft.setTextSize(2);
+      tft.drawString("O", xOffset, yOffset);
+      tft.drawString("=", xOffset + 15, yOffset);
+      //tft.drawString(String(angles[i],2), xOffset + 43, yOffset);
+      tft.drawLine(xOffset, yOffset - 1 + 8, xOffset + 7, yOffset - 2 + 8, TFT_WHITE);
+      tft.drawLine(xOffset, yOffset - 2 + 8, xOffset + 7, yOffset - 3 + 8, TFT_WHITE);
+      tft.setTextSize(1);
+      tft.drawString(String(i+1), xOffset + 10, yOffset + 15);
+    }
+    for (int i = 0; i < 3; i++) {
+
+    }
+    tft.setTextSize(2);
+
+    printAngles();
+
+    /*
     tft.setTextDatum(TL_DATUM);
     tft.drawString("JOINTS", 0, 0);
+    */
     String s = "t1: " + String(t1, 2);
+    /*
     tft.drawString(s, 0, 20);
     s = "t2: " + String(t2, 2);
     tft.drawString(s, 0, 40);
@@ -33,6 +56,7 @@ void updateDisplay(int _screen_no) {
     tft.drawString(s, 0, 100);
     s = "t6: " + String(t6, 2);
     tft.drawString(s, 0, 120);
+    */
 
     // Draw Cartesian Values
     tft.setTextDatum(TR_DATUM);
@@ -43,6 +67,7 @@ void updateDisplay(int _screen_no) {
     tft.drawString(s, 320, 40);
     s = "z: " + String(jointPositions[5][2], 2);
     tft.drawString(s, 320, 60);
+    
   }
 
   else {
@@ -90,6 +115,33 @@ void updateDisplay(int _screen_no) {
       }
     }
   }
+}
+
+//Separate function to update angle values to prevent redrawing over whole screen
+void printAngles() {
+  int xOffset = 33;
+  tft.fillRect(xOffset, 0, 70, height, TFT_BLACK);
+  int dy = height / 7 + 4;
+  for (int i = 0; i < 6; i++) {
+    int yOffset = height/28 + i*dy;
+    tft.drawString(String(angles[i], 1), xOffset, yOffset);
+  }
+}
+
+//shows what the left and right button are for
+void showButtons(String buttonLString, String buttonRString) {
+  tft.setTextSize(1);
+  tft.fillRect(106, 161, width-106, 10, TFT_BLACK);
+
+  tft.setTextDatum(BL_DATUM); //align text at top right corner
+  tft.drawString("L:" + buttonLString, 106, height-1);
+
+  tft.setTextDatum(BR_DATUM); //align text at bottom right corner
+  tft.drawString("R:" + buttonRString, width-1, height-1);
+
+  tft.setTextDatum(TL_DATUM); //align text back at default top left
+  tft.setTextSize(2);
+  tft.setTextColor(TFT_WHITE);
 }
 
 // void loop() {

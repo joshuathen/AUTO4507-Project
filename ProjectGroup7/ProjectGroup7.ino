@@ -82,8 +82,10 @@ int number_of_samples = 10; //will be increased as sampling goes on
 int playbackIndex = 0;  // To track current sample index
 bool gripperState; //0=open, 1=closed
 
-float a = 0.2, v = 0.2;
+float a = 0.1, v = 0.1;
 
+String STATE = "DISCONNECTED"; //initial state is disconnected from bot
+float angles[6];
 void setup() {
   Serial.begin(115200);
 
@@ -107,37 +109,36 @@ void setup() {
 
   //Set up ESP32-s3 screen
   tft.init();
-  tft.setTextSize(2);
-  tft.setTextDatum(MC_DATUM);
+  tft.setTextSize(1);
   tft.setRotation(1);
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE);
+  tft.setTextDatum(TL_DATUM);
   Serial.println("ESP screen prepared");
 
   //Connect to router
-  Serial.print("Connecting to ");
-  Serial.print(ssid);
-  Serial.print(" wifi...");
-  
-  WiFi.begin(ssid, password);
-  int failed_connections = 0;
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(200);
-    Serial.print(".");
-    failed_connections++;
-    if (failed_connections > 100){
-      Serial.println("FAILED TO CONNECT TO WIFI");
-      return;
+  int num_attempts = 10;  //how many times wifi will try to connect before throwing error
+  while (!connectToWifi(num_attempts)) {
+    while (true) {
+      if (!digitalRead(buttonL) || !digitalRead(buttonR)) {
+        num_attempts += 5;
+        break;
+      }
     }
   }
-  Serial.println("connected :)");
-  Serial.print("localIP: ");
-  Serial.println(WiFi.localIP());
+
+  //prints small loading bar along bottom to give time to read IP
+  for (int i = 0; i < width; i++) {
+    tft.drawLine(i, height - 40, i, height-10, TFT_GREEN);
+    delay(2000 / width);
+  }
+  delay(1000);
 
   // Display raw joint space / cartesian space values
   updateDisplay(2);
 
   // toggleUR5Connection();
+  STATE = "DISCONNECTED";
 }
 
 void loop() {
@@ -157,7 +158,46 @@ void loop() {
     Serial.print("| t6: "); Serial.println(t6);
   }
 
-  float myPose[] = {t1, (-90)*PI/180 , t3, -90*PI/180, 0, 0};
+  
+
+  if (STATE == "DISCONNECTED") {
+    showButtons("Connect", "");
+    if ((millis() - last_pressed) > 300) {
+      if (!digitalRead(buttonL)) {
+        if (toggleUR5Connection() && toggleGripperConnection()) {
+          STATE = "CONNECTED";
+        }
+        
+      }
+    }
+  } else if (STATE == "CONNECTED") {
+    showButtons("Live control", "Playback");
+    if ((millis() - last_pressed) > 300) {
+      if (!digitalRead(buttonL)) {
+        STATE == "LIVE CONTROL";
+      } else if (!digitalRead(buttonR)) {
+        playBack(); 
+      }
+    }
+  } else if (STATE == "LIVE CONTROL") {
+    if (millis() - last_sample > sampleRate){
+      moveL(angles, a, v, true);
+      last_sample = millis();
+    }  
+    //Add code here to record states
+    
+    showButtons("Toggle Gripper", "EXIT");
+    if ((millis() - last_pressed) > 300) {
+      if (!digitalRead(buttonL)) {
+        gripperState = !gripperState;
+        setGripper(gripperState);
+      } else if (!digitalRead(buttonR)) {
+        STATE = "CONNECTED";
+      }
+    }    
+  } else 
+
+  //float myPose[] = {t1, (-90)*PI/180 , t3, -90*PI/180, 0, 0};
   // moveJ(myPose, 0.5, 0.5, true);
   // delay(3000);
 
@@ -233,4 +273,33 @@ void loop() {
     // }
 
   }
+}
+
+bool connectToWifi(int num_attempts) {
+  tft.fillScreen(TFT_BLACK);
+  //Connect to router
+  String WifiConnectionMessage = "Connecting to " + String(ssid) + " wifi...";
+  tft.drawString(WifiConnectionMessage, 2, height / 4);
+
+  WiFi.begin(ssid, password);
+  int failed_connections = 0;
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(300);
+    WifiConnectionMessage += ".";
+    tft.drawString(WifiConnectionMessage, 2, height / 4);
+    failed_connections++;
+    if (failed_connections > num_attempts) {
+      tft.setTextColor(TFT_RED);
+      tft.drawString("FAILED TO CONNECT TO WIFI", 20, height / 2);
+      tft.drawString("Press any button to retry", 20, 3 * height / 4);
+      tft.setTextColor(TFT_WHITE);
+      return false;
+    }
+  }
+  tft.setTextColor(TFT_GREEN);
+  WifiConnectionMessage += "connected :)";
+  tft.drawString(WifiConnectionMessage, 2, height / 4);
+  tft.setTextColor(TFT_WHITE);
+  tft.drawString("localIP: " + String(WiFi.localIP()), 20, height / 2);
+  return true;
 }
