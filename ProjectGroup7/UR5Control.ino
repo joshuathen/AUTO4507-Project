@@ -3,9 +3,11 @@
 //Toggles connection to UR5e robot
 bool toggleUR5Connection()
 {
+  return true;
   if (!client.connected()) 
   {
     Serial.print("Connecting to ur5e...");
+    showCommand("Connecting to ur5e...");
     int failed_connections = 0;
     while(!client.connect(HOST, PORT)) {
       delay(200);
@@ -17,6 +19,7 @@ bool toggleUR5Connection()
       }
     }
     Serial.println("Robot connected :)");
+
     return true;
   } else {
     Serial.print("Disconnecting from ur5e...");
@@ -33,6 +36,7 @@ bool toggleUR5Connection()
 //Toggles connection to UR5e gripper
 bool toggleGripperConnection()
 {
+  return true;
   if (!gripper_client.connected()) 
   {
     Serial.print("Connecting to gripper...");
@@ -63,6 +67,15 @@ bool toggleGripperConnection()
 // sends the moveL command, has option to be in jointspace(jointspace = true) or in pose
 // a and v dont change anything as t is used to move to target position in 0.5 seconds(same as sample rate)
 bool moveL(float pose[], float a, float v, bool JointSpace) {
+  bool tooFast = false;
+  for (int i = 0; i < 6; i++) {
+    float target_v = (pose[i] - prev_angles[i])/SAMPLE_RATE;
+    if (target_v > v) {
+      tooFast = true;
+      break;
+    }
+  }
+
   String command = "movel(";
 
   if (JointSpace == false) {
@@ -78,8 +91,13 @@ bool moveL(float pose[], float a, float v, bool JointSpace) {
       command += ",";
     }
   }
-  command += "], a=" + String(a) + ", v=" + String(v) + ", t=" + String(sampleRate/1000) + ")\n";
-
+  command += "], a=" + String(a) + ", v=" + String(v);
+  if (!tooFast) {
+    command += ", t=" + String(SAMPLE_RATE/1000); 
+  } 
+  command += + ")\n";
+  
+  showCommand("movej(angles)");
   Serial.println(command);
   client.print(command);
   client.flush();
@@ -88,6 +106,15 @@ bool moveL(float pose[], float a, float v, bool JointSpace) {
 
 //same as moveL function above but with moveJ
 bool moveJ(float pose[], float a, float v, bool JointSpace) {
+  bool tooFast = false;
+  for (int i = 0; i < 6; i++) {
+    float target_v = (pose[i] - prev_angles[i])/SAMPLE_RATE;
+    if (target_v > v) {
+      tooFast = true;
+      break;
+    }
+  }
+
   String command = "movej(";
 
   if (JointSpace == false) {
@@ -103,8 +130,13 @@ bool moveJ(float pose[], float a, float v, bool JointSpace) {
       command += ",";
     }
   }
-  command += "], a=" + String(a) + ", v=" + String(v) + ", t=" + String(sampleRate/1000) + ")\n";
-
+  command += "], a=" + String(a) + ", v=" + String(v);
+  if (!tooFast) {
+    command += ", t=" + String(SAMPLE_RATE/1000); 
+  } 
+  command += + ")\n";
+  
+  showCommand("movej(angles)");
   Serial.println(command);
   client.print(command);
   client.flush();
@@ -119,8 +151,10 @@ bool setGripper(bool gripperState)
   String command = "SET POS ";
   if (!gripperState) {
     command += "0 ";
+    showCommand("Close gripper");
   } else {
     command += "255 ";
+    showCommand("Open gripper");
   }
   command += "\n";
 
@@ -151,7 +185,7 @@ bool playBack()
     }
 
     //small delay to allow robot into new position
-    delay(sampleRate);
+    delay(SAMPLE_RATE);
   }
   Serial.println("Playback finished");
   return true;
@@ -163,6 +197,7 @@ float mapFloat(int x, int in_min, int in_max, float out_min, float out_max) {
 
 //reads the potentiometer values and stores them in global angles array
 //this is the function to CALIBRATE POT READINGS TO ANGLES
+//Not needed, see "getJointAngles" instead
 // void getAngles() {
 //   int maxAngle = 270;
 //   int NUM_SAMPLES = 5;  //takes 5 readings of each pin to average them

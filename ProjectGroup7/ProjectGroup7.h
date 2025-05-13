@@ -26,7 +26,11 @@ extern WiFiClient client;
 extern WiFiClient gripper_client;
 extern String STATE;
 
-extern float **playback_states;
+#define PLAYBACK_MAX_TIME 60  //max playback length in seconds
+#define SAMPLE_RATE 3000 //samples position every 500ms
+#define PLAYBACK_ROWS (PLAYBACK_MAX_TIME / (SAMPLE_RATE / 1000))
+
+extern float playback_states[PLAYBACK_ROWS][7];
 extern bool gripperState;
 
 //UR5Control functions

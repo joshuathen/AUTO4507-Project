@@ -40,14 +40,14 @@ void createGraphicWindows() {
   showButtons("cnct", "tgl gripper");
 }
  
-//displays 6 angles from controller onto ttgo
-void printAngles(float angles[6]) {
+//displays 6 angles from controller onto ttgo in degrees
+void printAngles(){//float angles[6]) {
   int xOffset = 33;
   tft.fillRect(xOffset, 0, 70, height, TFT_BLACK);
   int dy = height / 7 + 4;
   for (int i = 0; i < 6; i++) {
     int yOffset = height/28 + i*dy;
-    tft.drawString(String(angles[i], 1), xOffset, yOffset);
+    tft.drawString(String(angles[i] * 180.0/PI, 1), xOffset, yOffset);
   }
 }
  
@@ -70,15 +70,13 @@ void showState(String state) {
     color = TFT_ORANGE;
   } else if (STATE == "CONNECTED") {\
      color = TFT_GREEN;
+  } else if (STATE == "LIVE CONTROL") {
+    color = TFT_YELLOW;
   } else if (STATE == "PLAYBACK") {
      color = TFT_BLUE;
   } else if (STATE == "FAILED CONNECTION") {
     color = TFT_RED;
-  } else if (STATE == "RECORDING LIVE") {
-    color = TFT_YELLOW;
-  } else if (STATE == "RUNNING") {
-    color = TFT_WHITE;
-  }
+  } 
  
   tft.setTextColor(color);
   tft.drawString(STATE, 110, 4);
@@ -87,16 +85,20 @@ void showState(String state) {
  
 //prints a string near buttons to show what each do e.g. "playback" or "connect"
 void showButtons(String buttonLString, String buttonRString) {
-  tft.setTextSize(1);
-  tft.fillRect(106, 161, width-106, 10, TFT_BLACK);
- 
-  tft.setTextDatum(BL_DATUM); //align text at top right corner
-  tft.drawString("L:" + buttonLString, 106, height-1);
- 
-  tft.setTextDatum(BR_DATUM); //align text at bottom right corner
-  tft.drawString("R:" + buttonRString, width-1, height-1);
- 
-  tft.setTextDatum(TL_DATUM); //align text back at default top left
-  tft.setTextSize(2);
-  tft.setTextColor(TFT_WHITE);
+  static int lastUpdate = millis();
+  if (millis() - lastUpdate > 500) {
+    tft.setTextSize(1);
+    tft.fillRect(106, 161, width-106, 10, TFT_BLACK);
+  
+    tft.setTextDatum(BL_DATUM); //align text at top right corner
+    tft.drawString("L:" + buttonLString, 106, height-1);
+  
+    tft.setTextDatum(BR_DATUM); //align text at bottom right corner
+    tft.drawString("R:" + buttonRString, width-1, height-1);
+  
+    tft.setTextDatum(TL_DATUM); //align text back at default top left
+    tft.setTextSize(2);
+    tft.setTextColor(TFT_WHITE);
+    lastUpdate = millis();
+  }
 }
