@@ -3,7 +3,6 @@
 //Toggles connection to UR5e robot
 bool toggleUR5Connection()
 {
-  return true;
   if (!client.connected()) 
   {
     Serial.print("Connecting to ur5e...");
@@ -36,7 +35,6 @@ bool toggleUR5Connection()
 //Toggles connection to UR5e gripper
 bool toggleGripperConnection()
 {
-  return true;
   if (!gripper_client.connected()) 
   {
     Serial.print("Connecting to gripper...");
