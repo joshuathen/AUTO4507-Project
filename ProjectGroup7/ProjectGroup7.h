@@ -44,6 +44,10 @@ bool playBack();
 
 //Graphics functions
 void printAngles();
+void getJointAngles();
+void showButtons(String buttonLString, String buttonRString);
+void showGraph();
+void showState(String state);
 
 // Joint Space (angles of each joint from base to tip)
 extern double t1; 

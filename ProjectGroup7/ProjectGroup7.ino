@@ -20,34 +20,6 @@ ProjectGroup7.h   - header file that declares any global variables that are used
 ProjectGroup7.ino - high level strategy of controlling the robot, just calls the functions from other files
 UR5Control.ino    - includes any functions that communicates or controls the UR5e 
 Graphics.ino      - all functions that control the ttgo display
-
-
-Whats been tested and works:
-- MoveJ and MoveL and the general connection to robot works
-
-
-Potential problems/changes:
-- Making the "playback_angles" 2D array used dynamic memory allocation which I havent done in ages, might have some syntax errors
-  or cause too much memory usage. Currently the stored values are rounded to floats with 2 decimal places, but less memory could be used
-  if they are stored as ints (e.g. multiply by 100 and round, and then in playback just divide by 100 again).
-
-- Currently the robot moves during recording sequence of angles AND during playback. I'm not sure if we want it to
-  move during the recording state or not
-
-- Haven't tested the gripper code yet, but should be easy to test by calling "toggleGripperConnection()" followed by 
-  "setGripper(bool gripperState)" in the setup function just to see if it moves
-
-- Potentiometer readings need to be scaled to the correct angle in "get_angles()" function
-
-- When the connection is first established and recording/control mode is entered, might be useful to have a moveJ call to move robot to 
-  the controller position and then wait for some time so the robot and controller are in sync.
-
-- currently calling moveJ and moveL uses a and v to control speed, in documentation i think calling 
-  movej(pose, a, v, t) will ignore the a and v, and just move to the position is time t.
-  e.g. having command = "movej([10,10,10,10,10,10], a=1,v=1, t=0.5\n" would move to the new position in 
-  0.5 seconds, this should be easy to implement in moveJ and could be more useful during playback as we are 
-  sampling the controller positons at SAMPLE_RATE = 0.5 seconds. During playback this would ensure the robot 
-  reaches the new position at exactly the right time rather than having to introduce a delay and waiting for it
 */
 
 #include "ProjectGroup7.h"
@@ -65,8 +37,8 @@ int buttonR = 14;
 TFT_eSPI tft = TFT_eSPI();
 int width= 320, height = 170;
 
-const char* ssid = "Donnabjbg"; //"UR5e"; 
-const char* password = "Stanley061220"; //"noisytrain086"; 
+const char* ssid = "UR5e"; 
+const char* password = "noisytrain086"; 
 
 //Server details
 const char* HOST = "192.168.1.59"; //"192.168.1.54" ; //"192.168.86.120" ;
@@ -86,6 +58,9 @@ float a = 0.1, v = 0.1; //max allowable speed in
 String STATE = "DISCONNECTED"; //initial state is disconnected from ur5
 float angles[6];
 float prev_angles[6]; //stores previous angles, used to determine if large change between angles so bot should slow down
+
+//bool connectToWifi(int num_attempts);
+
 void setup() {
   Serial.begin(115200);
 
@@ -126,6 +101,7 @@ void setup() {
       }
     }
   }
+  
 
   //prints small loading bar along bottom to give time to read IP
   for (int i = 0; i < width; i++) {
@@ -149,6 +125,7 @@ void loop() {
     last_refresh = millis();
     getJointAngles();
     printAngles();
+    showGraph();
     /*
     Serial.print("t1: "); Serial.print(t1);
     Serial.print("| t2: "); Serial.print(t2);

@@ -95,7 +95,7 @@ bool moveL(float pose[], float a, float v, bool JointSpace) {
   } 
   command += + ")\n";
   
-  showCommand("movej(angles)");
+  showCommand("movel(angles)");
   Serial.println(command);
   client.print(command);
   client.flush();
