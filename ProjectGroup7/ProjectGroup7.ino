@@ -41,7 +41,7 @@ const char* ssid = "UR5e";
 const char* password = "noisytrain086"; 
 
 //Server details
-const char* HOST = "192.168.1.59"; //"192.168.1.54" ; //"192.168.86.120" ;
+const char* HOST = "192.168.1.54";//"192.168.1.59"; // ; //"192.168.86.120" ;
 const int PORT = 30002;
 const int GRIPPER_PORT = 63352;
 
@@ -154,6 +154,8 @@ void loop() {
     showButtons("Live control", "Playback");
     if ((millis() - last_pressed) > 300) {
       if (!digitalRead(buttonL)) {
+        moveJ(angles, a, v, true);
+        
         showState("LIVE CONTROL");
         showCommand("live control");
 
@@ -163,6 +165,7 @@ void loop() {
         }
         playback_states[0][6] = gripperState; 
         playbackIndex = 1;
+        
 
       } else if (!digitalRead(buttonR)) {
         showState("PLAYBACK");
@@ -172,7 +175,7 @@ void loop() {
   } else if (STATE == "LIVE CONTROL") {
     showButtons("Toggle Gripper", "EXIT");
     if (millis() - last_sample > SAMPLE_RATE){
-      moveL(angles, a, v, true);
+      moveJ(angles, a, v, true);
 
       //stores current state into array
       for (int i = 0; i < 6; i++) {
@@ -193,7 +196,7 @@ void loop() {
     }    
   } else if (STATE == "PLAYBACK") {
     showButtons("EXIT", "");
-    moveL(playback_states[0], a, v, true);
+    moveJ(playback_states[0], a, v, true);
     setGripper(playback_states[0][7]); //may need to change if gripperState is being stored as 1.0 not 1
     Serial.println("Moving to starting position");
     showCommand("Moving to start");
@@ -205,7 +208,7 @@ void loop() {
         String msg = "Position " + String(i) + "/" + String(playbackIndex-1); 
         Serial.println(msg);
 
-        moveL(playback_states[i], a, v, true);
+        moveJ(playback_states[i], a, v, true);
         setGripper(playback_states[i][1]);
         i++;
       }

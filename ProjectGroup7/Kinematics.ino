@@ -20,20 +20,21 @@ void printJoints() {
 // Get and map joint angles from arduino (also calls functions to update Cartesian Space values and display)
 void getJointAngles() {
   for (int i = 0; i < 6; i++) {
-  prev_angles[i] = angles[i];
+    prev_angles[i] = angles[i];
   } 
   t1 = mapFloat(analogRead(ANALOG_PIN_1), 0, 4095, -150.0, 150.0) * PI / 180;
   t2 = (-90*PI/180) - mapFloat(analogRead(ANALOG_PIN_2), 0, 4095, -150.0, 150.0) * PI / 180;
+  //Serial.println(String(t1) + " and " + String(t2));
   t3 = mapFloat(analogRead(ANALOG_PIN_3), 0, 4095, -150.0, 150.0) * PI / 180;
   t4 = mapFloat(analogRead(ANALOG_PIN_4), 0, 4095, -150.0, 150.0) * PI / 180;
   t5 = mapFloat(analogRead(ANALOG_PIN_5), 0, 4095, -90.0, 90.0) * PI / 180;
   t6 = mapFloat(analogRead(ANALOG_PIN_6), 0, 4095, -90.0, 90.0) * PI / 180;
-  angles[0] = t1;
-  angles[1] = t2;
-  angles[2] = t3;
-  angles[3] = t4;
-  angles[4] = t5;
-  angles[5] = t6;
+  angles[0] = t1;//20.0*PI/180.0;//t1; //0;
+  angles[1] = -100.0*PI/180.0;//t2; //-100 *180/Pi;
+  angles[2] = 0;//t3;
+  angles[3] = 0;//t4;
+  angles[4] = 0;//t5;
+  angles[5] = 0;//t6;
 
   forwardKinematics();
 }

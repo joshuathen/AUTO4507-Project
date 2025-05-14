@@ -58,6 +58,11 @@ void printAngles() {  //float angles[6]) {
     int yOffset = height / 28 + i * dy;
     tft.drawString(String(angles[i] * 180.0 / PI, 1), xOffset, yOffset);
   }
+  /*
+  for (int i = 0; i<6; i++) {
+    Serial.print(String(i) + "=" + angles[i] + ", ");
+  }
+  */
 }
 
 void showCommand(String command) {

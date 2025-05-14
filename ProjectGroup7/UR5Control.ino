@@ -83,7 +83,7 @@ bool moveL(float pose[], float a, float v, bool JointSpace) {
   }
 
   for (int i = 0; i < 6; i++) {
-    float angle_rad = pose[i] * (PI / 180);
+    float angle_rad = pose[i];// * (PI / 180);
     command += String(angle_rad, 3);  //rounds angle to 3 decimal place
     if (i != 5) {
       command += ",";
@@ -122,7 +122,7 @@ bool moveJ(float pose[], float a, float v, bool JointSpace) {
   }
 
   for (int i = 0; i < 6; i++) {
-    float angle_rad = pose[i] * (PI / 180);
+    float angle_rad = pose[i]; // * (PI / 180);
     command += String(angle_rad, 3);  //rounds angle to 3 decimal place
     if (i != 5) {
       command += ",";
