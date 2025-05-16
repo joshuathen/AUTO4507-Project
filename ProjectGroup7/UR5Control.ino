@@ -49,6 +49,17 @@ bool toggleGripperConnection()
       }
     }
     Serial.println("Gripper connected :)");
+
+    //settings for gripper to make sure it moves
+    gripper_client.print("SET ACT 1\n");
+    gripper_client.flush();
+    gripper_client.print("SET GTO 1\n");
+    gripper_client.flush();
+    gripper_client.print("SET SPE 200\n");
+    gripper_client.flush();
+    gripper_client.print("SET FOR 200\n");
+    gripper_client.flush();
+
     return true;
   } else {
     Serial.print("Disconnecting from Gripper...");
