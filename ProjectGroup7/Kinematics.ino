@@ -17,26 +17,27 @@ void printJoints() {
   }
 }
 
-// Get and map joint angles from arduino (also calls functions to update Cartesian Space values and display)
+
+//Reads analog inputs and converts to angles(rad) and updats "angles" array
+//ANGLES STORED IN RADIANS
 void getJointAngles() {
   for (int i = 0; i < 6; i++) {
     prev_angles[i] = angles[i];
   } 
-  t1 = mapFloat(analogRead(ANALOG_PIN_1), 0, 4095, -150.0, 150.0) * PI / 180;
-  t2 = (-90*PI/180) - mapFloat(analogRead(ANALOG_PIN_2), 0, 4095, -150.0, 150.0) * PI / 180;
+  t1 = mapFloat(analogRead(BASE_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
+  t2 = (-90*PI/180) - mapFloat(analogRead(SHOULDER_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
   //Serial.println(String(t1) + " and " + String(t2));
-  t3 = mapFloat(analogRead(ANALOG_PIN_3), 0, 4095, -150.0, 150.0) * PI / 180;
-  t4 = mapFloat(analogRead(ANALOG_PIN_4), 0, 4095, -150.0, 150.0) * PI / 180;
-  t5 = mapFloat(analogRead(ANALOG_PIN_5), 0, 4095, -90.0, 90.0) * PI / 180;
-  t6 = mapFloat(analogRead(ANALOG_PIN_6), 0, 4095, -90.0, 90.0) * PI / 180;
-  angles[0] = t1;//20.0*PI/180.0;//t1; //0;
-  angles[1] = -100.0*PI/180.0;//t2; //-100 *180/Pi;
-  angles[2] = 0;//t3;
-  angles[3] = 0;//t4;
+  t3 = mapFloat(analogRead(ELBOW_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
+  t4 = mapFloat(analogRead(WRIST_1_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
+  t5 = mapFloat(analogRead(WRIST_2_PIN), 0, 4095, -90.0, 90.0) * PI / 180;
+  t6 = mapFloat(analogRead(WRIST_3_PIN), 0, 4095, -90.0, 90.0) * PI / 180;
+
+  angles[0] = 0;//t1; //0
+  angles[1] = -90*PI/180.0;//t2; //-100.0*PI/180.0;
+  angles[2] = t3;
+  angles[3] = -90*PI/180.0;//t4;
   angles[4] = 0;//t5;
   angles[5] = 0;//t6;
-
-  forwardKinematics();
 }
 
 // Updates Cartesian Space array (in-place) using joint angles t1-t6

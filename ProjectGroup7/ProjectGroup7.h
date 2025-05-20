@@ -3,17 +3,10 @@
 #include <math.h>
 
 //Pin assignments
-extern int buttonL;
-extern int buttonR;
-// extern int basePin;
-// extern int shoulderPin;
-// extern int elbowPin;
-// extern int wrist1Pin;
-// extern int wrist2Pin;
-// extern int wrist3Pin;
 
 //Global variables used across multiple files
 extern TFT_eSPI tft;
+#define TFT_DARK_GREEN 0x03E0
 
 extern const char* ssid;
 extern const char* password;
@@ -27,7 +20,7 @@ extern WiFiClient gripper_client;
 extern String STATE;
 
 #define PLAYBACK_MAX_TIME 60  //max playback length in seconds
-#define SAMPLE_RATE 3000 //samples position every 500ms
+#define SAMPLE_RATE 1000 //samples position every 500ms
 #define PLAYBACK_ROWS (PLAYBACK_MAX_TIME / (SAMPLE_RATE / 1000))
 
 extern float playback_states[PLAYBACK_ROWS][7];
@@ -45,7 +38,7 @@ bool playBack();
 //Graphics functions
 void printAngles();
 void getJointAngles();
-void showButtons(String buttonLString, String buttonRString);
+void showButtons(String WHITE_BUTTONString, String GREEN_BUTTONString);
 void showGraph();
 void showState(String state);
 
@@ -57,14 +50,14 @@ extern double t4;
 extern double t5;
 extern double t6;
 
-// PINOUT ESP32-S3
-#define ANALOG_PIN_1 1    // GPIO1 (safe on S3)
-#define ANALOG_PIN_2 2    // GPIO2 (safe)
-#define ANALOG_PIN_3 3    // GPIO3 (safe)
-#define ANALOG_PIN_4 10
-#define ANALOG_PIN_5 11
-#define ANALOG_PIN_6 12
-#define PUSHBUTTON_PIN 13 // Pushbutton used to toggle/change screens
+#define BASE_PIN 1
+#define SHOULDER_PIN 2   
+#define ELBOW_PIN 3  
+#define WRIST_1_PIN 10
+#define WRIST_2_PIN 11
+#define WRIST_3_PIN 12
+#define WHITE_BUTTON 0 //43
+#define GREEN_BUTTON 14 //44
 
 // Cartesian Space (3D point vectors of each joint from base to tip)
 extern double jointPositions[6][3];

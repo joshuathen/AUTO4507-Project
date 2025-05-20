@@ -3,6 +3,7 @@
 //Toggles connection to UR5e robot
 bool toggleUR5Connection()
 {
+  //return true;
   if (!client.connected()) 
   {
     Serial.print("Connecting to ur5e...");
@@ -35,6 +36,7 @@ bool toggleUR5Connection()
 //Toggles connection to UR5e gripper
 bool toggleGripperConnection()
 {
+  //return true; //for testing
   if (!gripper_client.connected()) 
   {
     Serial.print("Connecting to gripper...");
@@ -179,6 +181,7 @@ bool setGripper(bool gripperState)
 //currently using moveJ to move between positions and a 0.5 second delay between each 
 //entire state (including the gripperState) can be passed to the moveJ functions as they only iterate through
 //the first 6 elements anyways
+/*
 bool playBack()
 {
   //move to start position and wait 5 seconds
@@ -196,9 +199,9 @@ bool playBack()
     //small delay to allow robot into new position
     delay(SAMPLE_RATE);
   }
-  Serial.println("Playback finished");
   return true;
 }
+*/
 
 float mapFloat(int x, int in_min, int in_max, float out_min, float out_max) {
   return (float)(x - in_min) * (out_max - out_min) / (float)(in_max - in_min) + out_min;
