@@ -30,7 +30,7 @@ float playback_states[PLAYBACK_ROWS][7]; //each row = [t1,t2,t3,t4,t5,t6,gripper
 int playbackIndex = 0;  // To track current sample index
 bool gripperState; //0=open, 1=closed
 
-float a = 0.1, v = 0.1; //max allowable speed(rad/s) and accel(rad/s^2) 
+float a = 0.07, v = 0.07; //max allowable speed(rad/s) and accel(rad/s^2) 
 
 String STATE = "DISCONNECTED"; //initial state is disconnected from ur5
 float angles[6]; //stores current joint angle of controller
@@ -49,8 +49,8 @@ void setup() {
   pinMode(WRIST_2_PIN, INPUT);
   pinMode(WRIST_3_PIN, INPUT);
   
-  pinMode(WHITE_BUTTON, INPUT_PULLUP);
-  pinMode(GREEN_BUTTON, INPUT_PULLUP);
+  pinMode(RED_BUTTON, INPUT_PULLUP);
+  pinMode(BLUE_BUTTON, INPUT_PULLUP);
 
   //Clear serial monitor
   for (int i = 0; i < 30; i++) {
@@ -72,7 +72,7 @@ void setup() {
   int num_attempts = 20;  //how many times wifi will try to connect before timeout
   while (!connectToWifi(num_attempts)) {
     while (true) {
-      if (!digitalRead(WHITE_BUTTON) || !digitalRead(GREEN_BUTTON)) {
+      if (!digitalRead(RED_BUTTON) || !digitalRead(BLUE_BUTTON)) {
         num_attempts += 5;
         break;
       }
@@ -98,7 +98,7 @@ void loop() {
   
   /*
   if ((millis() - last_print) > 300) {
-    Serial.println("W: " + String(!digitalRead(WHITE_BUTTON)) + "G: " + String(!digitalRead(GREEN_BUTTON)));
+    Serial.println("W: " + String(!digitalRead(RED_BUTTON)) + "G: " + String(!digitalRead(BLUE_BUTTON)));
     last_print = millis();
   }
   */
@@ -121,7 +121,7 @@ void loop() {
   if (STATE == "DISCONNECTED") {
     showButtons("Connect", "");
     if ((millis() - last_pressed) > 300) {
-      if (!digitalRead(WHITE_BUTTON)) {
+      if (!digitalRead(RED_BUTTON)) {
         last_pressed = millis();
         if (toggleUR5Connection() && toggleGripperConnection()) {
           showState("CONNECTED");
@@ -134,7 +134,7 @@ void loop() {
   } else if (STATE == "CONNECTED") {
     showButtons("Live control", "Playback");
     if ((millis() - last_pressed) > 300) {
-      if (!digitalRead(WHITE_BUTTON)) {
+      if (!digitalRead(RED_BUTTON)) {
         moveJ(angles, a, v, true);
         
         showState("LIVE CONTROL");
@@ -148,7 +148,7 @@ void loop() {
         playbackIndex = 1;
         
 
-      } else if (!digitalRead(GREEN_BUTTON)) {
+      } else if (!digitalRead(BLUE_BUTTON)) {
         
         showState("PLAYBACK");
         //playbackIndex = 0;
@@ -179,10 +179,10 @@ void loop() {
       last_sample = millis();
     }  
     if ((millis() - last_pressed) > 300) {
-      if (!digitalRead(WHITE_BUTTON)) {
+      if (!digitalRead(RED_BUTTON)) {
         gripperState = !gripperState;
         setGripper(gripperState);
-      } else if (!digitalRead(GREEN_BUTTON)) {
+      } else if (!digitalRead(BLUE_BUTTON)) {
         //stops live playback and goes back to just being connected
         showState("CONNECTED");
       }
@@ -200,7 +200,7 @@ void loop() {
 
     //iterate through playback_states
     int i = 0;
-    while (i < playbackIndex && digitalRead(WHITE_BUTTON)) {
+    while (i < playbackIndex && digitalRead(RED_BUTTON)) {
       if (millis() - last_sample > SAMPLE_RATE){
         String msg = "Position " + String(i) + "/" + String(playbackIndex-1); 
         Serial.println(msg);
@@ -221,8 +221,6 @@ void loop() {
 }
 
 bool connectToWifi(int num_attempts) {
-  //return true; //for testing
-
   tft.fillScreen(TFT_BLACK);
   //Connect to router
   String WifiConnectionMessage = "Connecting to " + String(ssid) + " wifi...";
@@ -230,12 +228,14 @@ bool connectToWifi(int num_attempts) {
 
   WiFi.begin(ssid, password);
   int failed_connections = 0;
+  //return true; //for testing
   while (WiFi.status() != WL_CONNECTED) {
     delay(300);
     WifiConnectionMessage += ".";
     tft.drawString(WifiConnectionMessage, 2, height / 4);
     failed_connections++;
-    if (failed_connections > num_attempts) {
+    if (failed_connections > num_attempts){//num_attempts) {
+      break;
       tft.setTextColor(TFT_RED);
       tft.drawString("FAILED TO CONNECT TO WIFI", 20, height / 2);
       tft.drawString("Press any button to retry", 20, 3 * height / 4);
@@ -244,11 +244,11 @@ bool connectToWifi(int num_attempts) {
     }
   }
 
-  tft.setTextColor(TFT_GREEN);
+  tft.setTextColor(TFT_DARK_GREEN);
   WifiConnectionMessage += "connected :)";
   tft.drawString(WifiConnectionMessage, 2, height / 4);
   tft.setTextColor(TFT_WHITE);
-  tft.drawString("localIP: " + String(WiFi.localIP()), 20, height / 2);
-
+  //tft.drawString("localIP: " + String(WiFi.localIP()), 20, height / 2);
+  tft.drawString("localIP: 192.168.1.59", 20, height / 2);
   return true;
 }

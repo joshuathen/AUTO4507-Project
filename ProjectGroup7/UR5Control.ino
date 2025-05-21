@@ -3,7 +3,7 @@
 //Toggles connection to UR5e robot
 bool toggleUR5Connection()
 {
-  //return true;
+  //return true; //for testing
   if (!client.connected()) 
   {
     Serial.print("Connecting to ur5e...");

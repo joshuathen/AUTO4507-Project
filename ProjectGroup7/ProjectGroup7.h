@@ -19,10 +19,9 @@ extern WiFiClient client;
 extern WiFiClient gripper_client;
 extern String STATE;
 
-#define PLAYBACK_MAX_TIME 60  //max playback length in seconds
+#define PLAYBACK_MAX_TIME 120  //max playback length in seconds
 #define SAMPLE_RATE 1000 //samples position every 500ms
-#define PLAYBACK_ROWS (PLAYBACK_MAX_TIME / (SAMPLE_RATE / 1000))
-
+#define PLAYBACK_ROWS (PLAYBACK_MAX_TIME *SAMPLE_RATE) / 1000
 extern float playback_states[PLAYBACK_ROWS][7];
 extern bool gripperState;
 
@@ -38,7 +37,7 @@ bool playBack();
 //Graphics functions
 void printAngles();
 void getJointAngles();
-void showButtons(String WHITE_BUTTONString, String GREEN_BUTTONString);
+void showButtons(String RED_BUTTONString, String BLUE_BUTTONString);
 void showGraph();
 void showState(String state);
 
@@ -56,8 +55,8 @@ extern double t6;
 #define WRIST_1_PIN 10
 #define WRIST_2_PIN 11
 #define WRIST_3_PIN 12
-#define WHITE_BUTTON 0 //43
-#define GREEN_BUTTON 14 //44
+#define RED_BUTTON 14
+#define BLUE_BUTTON 0
 
 // Cartesian Space (3D point vectors of each joint from base to tip)
 extern double jointPositions[6][3];

@@ -158,19 +158,19 @@ void showGraphicDisplay() {
 }
 
 //prints button controls in small font at bottom of screen
-void showButtons(String WHITE_BUTTONString, String GREEN_BUTTONString) {
+void showButtons(String RED_BUTTONString, String BLUE_BUTTONString) {
   static unsigned long last_update = millis();
   if (millis() - last_update > 300) {
     tft.setTextSize(1);
     tft.fillRect(106, 161, width - 106, 10, TFT_BLACK);
 
     tft.setTextDatum(BL_DATUM);  //align text at top right corner
-    tft.setTextColor(TFT_WHITE);
-    tft.drawString("W:" + WHITE_BUTTONString, 106, height - 1);
+    tft.setTextColor(TFT_RED);
+    tft.drawString("1:" + RED_BUTTONString, 106, height - 1);
 
-    tft.setTextColor(TFT_DARK_GREEN);
+    tft.setTextColor(TFT_BLUE);
     tft.setTextDatum(BR_DATUM);  //align text at bottom right corner
-    tft.drawString("G:" + GREEN_BUTTONString, width - 1, height - 1);
+    tft.drawString("2:" + BLUE_BUTTONString, width - 1, height - 1);
 
     tft.setTextDatum(TL_DATUM);  //align text back to default top left
     tft.setTextSize(2);

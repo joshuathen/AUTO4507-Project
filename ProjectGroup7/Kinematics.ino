@@ -24,20 +24,22 @@ void getJointAngles() {
   for (int i = 0; i < 6; i++) {
     prev_angles[i] = angles[i];
   } 
-  t1 = mapFloat(analogRead(BASE_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
-  t2 = (-90*PI/180) - mapFloat(analogRead(SHOULDER_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
+  t1 = mapFloat(analogRead(BASE_PIN), 0, 4095, -142.0, 170.73) * PI / 180; //mapFloat(analogRead(BASE_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
+  t2 = mapFloat(analogRead(SHOULDER_PIN), 1040, 3300, 0, -180) * PI/180; //(-90*PI/180) - mapFloat(analogRead(SHOULDER_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
   //Serial.println(String(t1) + " and " + String(t2));
   t3 = mapFloat(analogRead(ELBOW_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
   t4 = mapFloat(analogRead(WRIST_1_PIN), 0, 4095, -150.0, 150.0) * PI / 180;
   t5 = mapFloat(analogRead(WRIST_2_PIN), 0, 4095, -90.0, 90.0) * PI / 180;
   t6 = mapFloat(analogRead(WRIST_3_PIN), 0, 4095, -90.0, 90.0) * PI / 180;
 
-  angles[0] = 0;//t1; //0
-  angles[1] = -90*PI/180.0;//t2; //-100.0*PI/180.0;
-  angles[2] = t3;
-  angles[3] = -90*PI/180.0;//t4;
-  angles[4] = 0;//t5;
-  angles[5] = 0;//t6;
+  angles[0] = t1; //0;//t1;//0             //  map(reading, angle), (1855,0), (3037,90), (680,-90), (0,-150), (4095,150) 
+  angles[1] = t2;//-90*PI/180.0;// t2//  map(reading, angle), (2295, -90), (1040, 0), (3300, -180) 
+  angles[2] = t3;//0; //t3;
+  angles[3] =t4;//-90*PI/180.0; // map(reading, angle), (1433, -90), 
+  angles[4] = t5;//0;
+  angles[5] = t6;//0;
+  //Serial.println("Reading:" + String(analogRead(WRIST_1_PIN)) + " MA1:" + String(t4 * 180.0 / PI, 1));
+  delay(300);
 }
 
 // Updates Cartesian Space array (in-place) using joint angles t1-t6
